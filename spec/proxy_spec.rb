@@ -32,7 +32,7 @@ RSpec.describe 'Proxy' do
     end
   end
   describe "request with proper X-API-Key must be ended with status 200" do
-  	it "have correct X-API-Key http header and fail" do
+  	it "have correct X-API-Key http header and response http ok" do
       get request("/hello_world"), nil, {'HTTP_X_API_KEY' => "demouser"}
       expect(last_response.status).to eq(200)
       expect(last_response.body).to eq("hello world")
