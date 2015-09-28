@@ -4,7 +4,7 @@ require './proxy'
 RSpec.describe 'Proxy' do
 
   def app
-   Sinatra::Application
+    Sinatra::Application
   end
 
   def request(url)
@@ -12,6 +12,12 @@ RSpec.describe 'Proxy' do
   end
 
   describe "request without proper X-API-Key must be ended with status 403" do
+    # Test application with real request to real, not stubbed server
+    before(:all) do
+      %x(rackup -p #{ENV['PORT'] || '11139'} -P server.pid -D)
+      sleep 1
+    end
+
     it "have no X-API-Key at all and fail" do
       get request '/'
       expect(last_response.status).to eq(403)
@@ -35,6 +41,12 @@ RSpec.describe 'Proxy' do
       get request "/?api_key=awesomeserver"
       expect(last_response.status).to eq(200)
       expect(last_response.body).to eq("welcome")
+    end
+  end
+
+  after(:all) do
+    if File.exist? "server.pid"
+      %x(kill -9 `cat server.pid; rm -f server.pid`)
     end
   end
 end
